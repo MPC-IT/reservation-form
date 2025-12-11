@@ -27,10 +27,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Missing required fields." });
     }
 
+    // Get company name for the profile
+    const company = await prisma.company.findUnique({
+      where: { id: Number(companyId) }
+    });
+
+    if (!company) {
+      return res.status(400).json({ error: "Company not found." });
+    }
+
     const profile = await prisma.profile.create({
       data: {
         profileType,
         callType,
+        companyName: company.name,
         companyId: Number(companyId),
         dealName: dealName || null,
         setupName: setupName || null,

@@ -71,7 +71,7 @@ export default async function handler(
         dealName,
         setupName,
         setupEmail,
-        callDate: new Date(callDate),
+        callDate,
         startTime,
         timeZone,
         hostPasscode,

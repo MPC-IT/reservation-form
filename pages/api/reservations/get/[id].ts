@@ -59,7 +59,7 @@ export default async function handler(
     return res.status(200).json({
       ...reservation,
       // Format dates as strings for the client
-      callDate: reservation.callDate.toISOString().split('T')[0],
+      callDate: reservation.callDate,
       createdAt: reservation.createdAt.toISOString(),
       updatedAt: reservation.updatedAt.toISOString(),
     });

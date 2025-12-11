@@ -20,21 +20,16 @@ export default async function handler(
 
     const { id } = req.query;
 
-    const reservation = await prisma.reservation.findUnique({
+    const reservation = await prisma.profile.findUnique({
       where: { id: Number(id) },
       include: {
-        user: {
+        company: true,
+        setup: true,
+        createdBy: {
           select: {
             id: true,
             name: true,
             email: true,
-          },
-        },
-        company: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
           },
         },
       },
@@ -44,16 +39,9 @@ export default async function handler(
       return res.status(404).json({ message: 'Reservation not found' });
     }
 
-    // Check if user is authorized to view this reservation
-    if (session.role !== 'ADMIN' && reservation.userId !== session.userId) {
-      return res.status(403).json({ message: 'Forbidden' });
-    }
-
     // Format dates for display
     const formattedReservation = {
       ...reservation,
-      startTime: reservation.startTime.toISOString(),
-      endTime: reservation.endTime.toISOString(),
       createdAt: reservation.createdAt.toISOString(),
       updatedAt: reservation.updatedAt.toISOString(),
     };

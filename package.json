@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron . --no-sandbox\"",
-    "electron:build": "npm run build && electron-builder",
+    "electron:build": "npm run build && electron-builder --win",
     "electron:prod": "npm run build && npm run start:prod",
     "start:prod": "PORT=3001 next start",
     "electron:start": "electron .",
@@ -48,7 +48,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/icon.ico"
+      "icon": "public/reservations-form.ico"
     },
     "files": [
       "out/**/*",
@@ -60,7 +60,11 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Reservation Form"
     }
   },
   "devDependencies": {
