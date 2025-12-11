@@ -1,18 +1,45 @@
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  type ChangeEvent,
+} from "react";
+import type { Company } from "../types/company";
 
-export default function EditCompanyModal({ open, company, onClose, onUpdated }) {
+interface EditCompanyModalProps {
+  open: boolean;
+  company?: Company | null;
+  onClose: () => void;
+  onUpdated: () => void;
+}
+
+export default function EditCompanyModal({
+  open,
+  company,
+  onClose,
+  onUpdated,
+}: EditCompanyModalProps) {
   const [name, setName] = useState("");
 
   useEffect(() => {
     if (company) {
       setName(company.name);
+    } else {
+      setName("");
     }
   }, [company]);
 
   if (!open) return null;
 
   async function handleSave() {
-    if (!name.trim()) return alert("Name cannot be empty");
+    if (!name.trim()) {
+      alert("Name cannot be empty");
+      return;
+    }
+
+    if (!company) {
+      alert("No company selected.");
+      return;
+    }
 
     const res = await fetch("/api/companies/update", {
       method: "POST",
@@ -23,7 +50,10 @@ export default function EditCompanyModal({ open, company, onClose, onUpdated }) 
       }),
     });
 
-    if (!res.ok) return alert("Error updating company");
+    if (!res.ok) {
+      alert("Error updating company");
+      return;
+    }
 
     onUpdated();
     onClose();
@@ -38,14 +68,15 @@ export default function EditCompanyModal({ open, company, onClose, onUpdated }) 
           type="text"
           className="input mb-3"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setName(e.target.value)
+          }
         />
 
         <div className="flex justify-end space-x-3">
           <button className="btn-secondary px-4" onClick={onClose}>
             Cancel
           </button>
-
           <button className="btn-primary px-4" onClick={handleSave}>
             Save
           </button>

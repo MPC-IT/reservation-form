@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AddCompanyModal from "../components/AddCompanyModal";
+import type { Company } from "../types/company"; // ← NEW
 
 // ------------------------------
 // VALIDATION SCHEMA
@@ -32,7 +33,7 @@ export default function ProfileForm() {
   const [profileType, setProfileType] = useState("");
   const [callType, setCallType] = useState("");
 
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]); // ← FIXED
   const [showAddCompany, setShowAddCompany] = useState(false);
 
   useEffect(() => {
@@ -43,9 +44,7 @@ export default function ProfileForm() {
           const data = await res.json();
           setCompanies(data.companies || []);
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
     }
     fetchCompanies();
   }, []);

@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
+import type { Company } from "../types/company";
 
-export default function AddCompanyModal({ open, onClose, onCreated }) {
+interface AddCompanyModalProps {
+  open: boolean;
+  onClose: () => void;
+  onCreated: (company: Company) => void;
+}
+
+export default function AddCompanyModal({
+  open,
+  onClose,
+  onCreated,
+}: AddCompanyModalProps) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -46,7 +57,9 @@ export default function AddCompanyModal({ open, onClose, onCreated }) {
           placeholder="Company name"
           className="input mb-3"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setName(e.target.value)
+          }
         />
 
         {error && <p className="text-red-600 mb-3">{error}</p>}

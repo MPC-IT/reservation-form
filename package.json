@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+	"desktop": "NODE_ENV=development electron .",
+	"desktop-build": "NODE_ENV=production electron-builder"
     "tailwind:build": "tailwindcss -i ./styles/globals.css -o ./styles/output.css --watch",
     "tailwind:init": "tailwindcss init -p"
   },

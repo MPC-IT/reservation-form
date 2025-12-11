@@ -3,28 +3,34 @@ const path = require("path");
 
 /**
  * Determine if we're in development mode.
- * In dev: we load http://localhost:3000
- * In prod: we would load a built app (later).
+ * In dev: we load http://localhost:3000 (your Next.js dev server)
+ * In prod: we load the hosted live app URL.
  */
 const isDev = process.env.NODE_ENV === "development";
+
+// 🔁 Replace this with your real live URL:
+const PROD_URL = "https://your-production-url.example.com";
 
 let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 1400,
+    height: 900,
+    minWidth: 1024,
+    minHeight: 700,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
   if (isDev) {
-    // In dev, load Next.js dev server
+    // Dev: use local Next.js dev server
     mainWindow.loadURL("http://localhost:3000");
   } else {
-    // In prod, you'd point to a built version; we can wire this up later
-    mainWindow.loadURL("http://localhost:3000");
+    // Prod: use your hosted web app
+    mainWindow.loadURL(PROD_URL);
   }
 
   mainWindow.on("closed", () => {
