@@ -1,4 +1,4 @@
-export interface Company {
-  id: string | number;
+export type Company = {
+  id: string;
   name: string;
-}
+};
