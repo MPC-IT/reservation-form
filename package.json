@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
+    "electron-is-dev": "^3.0.1",
     "formidable": "^3.5.4",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.294.0",
@@ -41,8 +42,8 @@
     "zod": "^3.22.4"
   },
   "build": {
-    "appId": "com.yourcompany.reservationapp",
-    "productName": "Reservation Form",
+    "appId": "com.multipoint.reservationform",
+    "productName": "Reservation-Form",
     "linux": {
       "target": "AppImage"
     },
@@ -64,7 +65,12 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Reservation Form"
+      "shortcutName": "Reservation-Form",
+      "installerIcon": "public/reservations-form.ico",
+      "uninstallerIcon": "public/reservations-form.ico",
+      "installerHeaderIcon": "public/reservations-form.ico",
+      "artifactName": "Reservation-Form-Setup-${version}.exe",
+      "deleteAppDataOnUninstall": false
     }
   },
   "devDependencies": {
@@ -77,7 +83,7 @@
     "@types/react-dom": "18.2.7",
     "autoprefixer": "^10.4.15",
     "concurrently": "^8.2.1",
-    "electron": "^39.2.6",
+    "electron": "^28.3.0",
     "electron-builder": "^26.0.12",
     "eslint": "8.48.0",
     "eslint-config-next": "13.5.4",
