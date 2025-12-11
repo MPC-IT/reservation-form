@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique        // MPC email, e.g. leesa@multipointcom.com
+  password String                  // hashed with bcrypt
+  name     String
+  role     String   @default("staff") // "staff" or "admin"
+  active   Boolean  @default(true)
+
+  createdProfiles Profile[] @relation("CreatedBy")
+  updatedProfiles Profile[] @relation("UpdatedBy")
+}
+
+model Profile {
+  id            Int      @id @default(autoincrement())
+
+  // Reservation Type
+  profileType   String
+  callType      String
+
+  // Details
+  companyName   String
+  dealName      String?
+  setupName     String?
+  setupEmail    String?
+
+  callDate      String?
+  startTime     String?
+  timeZone      String?
+
+  // Passcodes / Conference ID
+  hostPasscode  String?
+  guestPasscode String?
+  conferenceId  String?
+
+  notes         String?
+
+  // Status lifecycle: Draft → Pending Confirmation → Confirmed → Completed / TBD / Cancelled
+  status        String   @default("Draft")
+
+  // Audit fields
+  createdById   Int?
+  updatedById   Int?
+
+  // Relationships
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  
+  createdBy     User?    @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedBy     User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profiles  Profile[]
+}
