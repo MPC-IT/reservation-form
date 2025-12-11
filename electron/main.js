@@ -2,6 +2,9 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const isDev = require("electron-is-dev");
 
+// Fix ICU error on Windows
+app.commandLine.appendSwitch('disable-features', 'VizDisplayCompositor');
+
 // 🔁 Replace this with your real live URL:
 const PROD_URL = `file://${path.join(__dirname, '../out/index.html')}`;
 
@@ -25,7 +28,7 @@ function createWindow() {
 
   const startUrl = isDev
     ? 'http://localhost:3000'
-    : 'http://localhost:3001'; // Production will run Next.js server on port 3001
+    : `file://${path.join(__dirname, '../out/index.html')}`; // Static build
 
   console.log('Loading URL:', startUrl);
   mainWindow.loadURL(startUrl);
