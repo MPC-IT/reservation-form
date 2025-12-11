@@ -24,11 +24,7 @@ export default function DetailsPage() {
         Reservation Details
       </h1>
 
-      <ProfileForm
-        profileType={String(profileType)}
-        callType={String(callType)}
-        reservationId={reservationId ? Number(reservationId) : null}
-      />
+      <ProfileForm />
     </div>
   );
 }

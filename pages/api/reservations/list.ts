@@ -111,7 +111,7 @@ export default async function handler(
     });
 
     // Format the response
-    const formattedReservations = reservations.map((reservation) => ({
+    const formattedReservations = reservations.map((reservation: any) => ({
       ...reservation,
       callDate: reservation.callDate.toISOString().split('T')[0],
       createdAt: reservation.createdAt.toISOString(),

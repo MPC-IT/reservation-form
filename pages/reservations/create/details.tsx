@@ -28,7 +28,7 @@ const reservationSchema = z.object({
 
 type ReservationFormData = z.infer<typeof reservationSchema>;
 
-export default function ReservationDetails({ companies, callType }) {
+export default function ReservationDetails({ companies, callType }: { companies: any[], callType?: string }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewCompanyModal, setShowNewCompanyModal] = useState(false);

@@ -1,0 +1,9 @@
+# .npmignore
+.git
+.gitignore
+node_modules/
+.next/
+out/
+*.log
+.env*
+*.md

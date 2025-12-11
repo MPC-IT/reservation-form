@@ -150,45 +150,56 @@ export default function AdminReservationsPage() {
   }
 
   return (
-    <>
-      <div className="p-8 space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">All Reservations</h1>
-          <button
-            className="btn-primary"
-            onClick={() => router.push("/reservation/create")}
-          >
-            + New Reservation
-          </button>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-primary mb-2">All Reservations</h1>
+          <p className="text-secondary">
+            Manage and view all reservation records
+          </p>
         </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => router.push("/reservations/create")}
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          New Reservation
+        </button>
+      </div>
 
-        {/* Filters */}
+      {/* Filters */}
+      <div className="card">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-primary">Filters</h3>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
-            <label className="text-sm font-semibold">Profile Type</label>
+            <label className="label">Profile Type</label>
             <select
-              className="input"
+              className="select"
               value={profileFilter}
               onChange={(e) => {
                 setProfileFilter(e.target.value);
                 setCallTypeFilter("");
               }}
             >
-              <option value="">All</option>
+              <option value="">All Types</option>
               <option value="Assisted">Assisted</option>
               <option value="Passcode">Passcode</option>
             </select>
           </div>
 
           <div>
-            <label className="text-sm font-semibold">Call Type</label>
+            <label className="label">Call Type</label>
             <select
-              className="input"
+              className="select"
               value={callTypeFilter}
               onChange={(e) => setCallTypeFilter(e.target.value)}
               disabled={!profileFilter}
             >
-              <option value="">All</option>
+              <option value="">All Types</option>
               {profileFilter === "Assisted" &&
                 assistedTypes.map((t) => (
                   <option key={t} value={t}>
@@ -205,13 +216,13 @@ export default function AdminReservationsPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold">Status</label>
+            <label className="label">Status</label>
             <select
-              className="input"
+              className="select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="">All</option>
+              <option value="">All Statuses</option>
               {statusOptions.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -221,7 +232,7 @@ export default function AdminReservationsPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold">From Date</label>
+            <label className="label">From Date</label>
             <input
               type="date"
               className="input"
@@ -231,7 +242,7 @@ export default function AdminReservationsPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold">To Date</label>
+            <label className="label">To Date</label>
             <input
               type="date"
               className="input"
@@ -242,8 +253,8 @@ export default function AdminReservationsPage() {
         </div>
 
         {/* Search */}
-        <div>
-          <label className="text-sm font-semibold">Search</label>
+        <div className="mt-4">
+          <label className="label">Search</label>
           <input
             className="input"
             placeholder="Company, Deal, Conference ID, Passcode..."
@@ -251,95 +262,92 @@ export default function AdminReservationsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+      </div>
 
-        {/* Table */}
-        <div className="card mt-4">
-          {loading ? (
-            <p className="text-gray-600">Loading reservations…</p>
-          ) : filtered.length === 0 ? (
-            <p className="text-gray-600">No reservations found.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-gray-100 text-left">
-                    <th className="px-3 py-2 border-b">Company</th>
-                    <th className="px-3 py-2 border-b">Profile</th>
-                    <th className="px-3 py-2 border-b">Call Type</th>
-                    <th className="px-3 py-2 border-b">Key ID</th>
-                    <th className="px-3 py-2 border-b">Date</th>
-                    <th className="px-3 py-2 border-b">Time</th>
-                    <th className="px-3 py-2 border-b">Status</th>
-                    <th className="px-3 py-2 border-b text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-50">
-                      <td className="px-3 py-2 border-b">
-                        <div className="font-semibold">
-                          {p.company?.name || "—"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {p.dealName}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 border-b">{p.profileType}</td>
-                      <td className="px-3 py-2 border-b">{p.callType}</td>
-                      <td className="px-3 py-2 border-b">
-                        {keyIdentifier(p)}
-                      </td>
-                      <td className="px-3 py-2 border-b">
-                        {p.callDate || "N/A"}
-                      </td>
-                      <td className="px-3 py-2 border-b">
-                        {p.startTime
-                          ? `${p.startTime} ${p.timeZone || ""}`
-                          : "N/A"}
-                      </td>
-                      <td className="px-3 py-2 border-b">
-                        <span
-                          className={
-                            "px-2 py-1 text-xs rounded-full " +
-                            statusBadgeClass(p.status)
+      {/* Table */}
+      <div className="card">
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="text-secondary">Loading reservations…</div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-secondary">No reservations found.</div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Profile</th>
+                  <th>Call Type</th>
+                  <th>Key ID</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((p) => (
+                  <tr key={p.id}>
+                    <td>
+                      <div className="font-semibold text-primary">
+                        {p.company?.name || "—" }
+                      </div>
+                      <div className="text-xs text-muted">
+                        {p.dealName}
+                      </div>
+                    </td>
+                    <td>{p.profileType}</td>
+                    <td>{p.callType}</td>
+                    <td className="font-mono text-sm">
+                      {keyIdentifier(p)}
+                    </td>
+                    <td>{p.callDate || "N/A"}</td>
+                    <td>
+                      {p.startTime
+                        ? `${p.startTime} ${p.timeZone || ""}`
+                        : "N/A"}
+                    </td>
+                    <td>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${statusBadgeClass(p.status)}`}
+                      >
+                        {p.status}
+                      </span>
+                    </td>
+                    <td className="text-right">
+                      <div className="flex justify-end items-center space-x-2">
+                        <select
+                          className="select text-xs w-32"
+                          value={p.status}
+                          onChange={(e) =>
+                            changeStatus(p.id, e.target.value)
                           }
                         >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 border-b text-right">
-                        <div className="flex justify-end items-center space-x-2">
-                          <select
-                            className="input text-xs w-40"
-                            value={p.status}
-                            onChange={(e) =>
-                              changeStatus(p.id, e.target.value)
-                            }
-                          >
-                            {statusOptions.map((s) => (
-                              <option key={s} value={s}>
-                                {s}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            className="btn-primary text-xs"
-                            onClick={() => goToExport(p)}
-                          >
-                            Export
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                          {statusOptions.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          className="btn btn-secondary text-xs"
+                          onClick={() => goToExport(p)}
+                        >
+                          Export
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

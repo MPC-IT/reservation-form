@@ -53,6 +53,8 @@ model Profile {
   // Relationships
   companyId   Int?
   company     Company? @relation(fields: [companyId], references: [id])
+  setupId     Int?
+  setup       Setup?   @relation(fields: [setupId], references: [id])
   
   createdBy     User?    @relation("CreatedBy", fields: [createdById], references: [id])
   updatedBy     User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
@@ -60,7 +62,6 @@ model Profile {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-
 }
 
 model Company {
@@ -70,4 +71,30 @@ model Company {
   updatedAt DateTime @updatedAt
 
   profiles  Profile[]
+  setups    Setup[]
+}
+
+model Setup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String?
+  companyId   Int
+  company     Company  @relation(fields: [companyId], references: [id])
+  profiles    Profile[]
+  teamCalls   TeamCall[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([companyId, name])
+}
+
+model TeamCall {
+  id          Int      @id @default(autoincrement())
+  name        String
+  setupId     Int
+  setup       Setup    @relation(fields: [setupId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([setupId, name])
 }

@@ -40,13 +40,17 @@ export default function Layout({ children }: { children: ReactNode }) {
   const hideNav = router.pathname.startsWith("/auth");
 
   if (hideNav) {
-    return <main className="min-h-screen bg-gray-50 flex items-center justify-center">{children}</main>;
+    return (
+      <main className="min-h-screen bg-surface flex items-center justify-center">
+        {children}
+      </main>
+    );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-secondary">Loading...</div>
       </div>
     );
   }
@@ -54,71 +58,59 @@ export default function Layout({ children }: { children: ReactNode }) {
   const isAdmin = user.role === "admin";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-surface flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="nav-sidebar">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <Image src="/images/mpc-logo.png" alt="MPC Logo" width={40} height={40} />
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">MPC</h1>
-              <p className="text-xs text-gray-500">Reservation System</p>
-            </div>
+        <div className="p-6 border-b border-custom">
+          <div className="flex items-center justify-center">
+            <Image src="/images/mpc-logo.png" alt="MPC Logo" width={110} height={110} />
           </div>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className={`w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              router.pathname === "/dashboard"
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-700 hover:bg-gray-100"
+          <a
+            href="/dashboard"
+            className={`nav-item ${
+              router.pathname === "/dashboard" ? "active" : ""
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             <span>Dashboard</span>
-          </button>
+          </a>
 
-          <button
-            onClick={() => router.push("/reservations/create")}
-            className={`w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              router.pathname.startsWith("/reservations/create")
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-700 hover:bg-gray-100"
+          <a
+            href="/reservations/create"
+            className={`nav-item ${
+              router.pathname.startsWith("/reservations/create") ? "active" : ""
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             <span>New Reservation</span>
-          </button>
+          </a>
 
-          <button
-            onClick={() => router.push("/admin/reservations")}
-            className={`w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              router.pathname === "/admin/reservations"
-                ? "bg-blue-50 text-blue-700"
-                : "text-gray-700 hover:bg-gray-100"
+          <a
+            href="/admin/reservations"
+            className={`nav-item ${
+              router.pathname === "/admin/reservations" ? "active" : ""
             }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <span>All Reservations</span>
-          </button>
+          </a>
 
           {isAdmin && (
-            <button
-              onClick={() => router.push("/admin")}
-              className={`w-full flex items-center space-x-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                router.pathname === "/admin"
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
+            <a
+              href="/admin"
+              className={`nav-item ${
+                router.pathname === "/admin" ? "active" : ""
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,25 +118,25 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               <span>Admin</span>
-            </button>
+            </a>
           )}
         </nav>
 
         {/* User section */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-custom">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+              <div className="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center text-sm font-medium">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                <p className="text-sm font-medium text-primary">{user.name}</p>
+                <p className="text-xs text-muted capitalize">{user.role}</p>
               </div>
             </div>
             <button
               onClick={logout}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-2 text-muted hover:text-primary transition-colors"
               title="Logout"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,14 +150,19 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Top header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <h2 className="text-xl font-semibold text-gray-900 capitalize">
+        <header className="header">
+          <h2 className="text-xl font-semibold text-primary capitalize">
             {router.pathname.split("/").pop()?.replace("-", " ") || "Dashboard"}
           </h2>
+          <div className="flex items-center space-x-3">
+            <div className="text-sm text-secondary">
+              {user.name}
+            </div>
+          </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="main-content">
           {children}
         </main>
       </div>

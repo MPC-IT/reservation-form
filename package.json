@@ -2,13 +2,18 @@
   "name": "reservation-form",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
+  "homepage": ".",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-	"desktop": "NODE_ENV=development electron .",
-	"desktop-build": "NODE_ENV=production electron-builder",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron . --no-sandbox\"",
+    "electron:build": "npm run build && electron-builder",
+    "electron:prod": "npm run build && npm run start:prod",
+    "start:prod": "PORT=3001 next start",
+    "electron:start": "electron .",
     "tailwind:build": "tailwindcss -i ./styles/globals.css -o ./styles/output.css --watch",
     "tailwind:init": "tailwindcss init -p"
   },
@@ -16,7 +21,7 @@
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@hookform/resolvers": "^3.3.4",
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.22.0",
     "@radix-ui/react-slot": "^1.0.2",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
@@ -25,16 +30,42 @@
     "formidable": "^3.5.4",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.294.0",
-    "next": "^13.5.11",
+    "next": "^16.0.8",
     "next-auth": "^4.23.2",
+    "prisma": "^5.22.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.47.0",
+    "swr": "^2.3.7",
     "tailwind-merge": "^2.0.0",
     "zod": "^3.22.4"
   },
+  "build": {
+    "appId": "com.yourcompany.reservationapp",
+    "productName": "Reservation Form",
+    "linux": {
+      "target": "AppImage"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "files": [
+      "out/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/cookie": "^0.6.0",
     "@types/formidable": "^3.4.6",
     "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "20.8.4",
@@ -43,6 +74,7 @@
     "autoprefixer": "^10.4.15",
     "concurrently": "^8.2.1",
     "electron": "^39.2.6",
+    "electron-builder": "^26.0.12",
     "eslint": "8.48.0",
     "eslint-config-next": "13.5.4",
     "postcss": "^8.4.29",

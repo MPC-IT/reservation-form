@@ -48,34 +48,50 @@ export default function AddCompanyModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-96">
-        <h2 className="text-xl font-bold mb-4">Add New Company</h2>
+    <div className="modal-overlay">
+      <div className="modal">
+        <h2 className="text-xl font-bold text-primary mb-4">Add New Company</h2>
 
-        <input
-          type="text"
-          placeholder="Company name"
-          className="input mb-3"
-          value={name}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setName(e.target.value)
-          }
-        />
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="company-name" className="label">
+              Company Name
+            </label>
+            <input
+              id="company-name"
+              type="text"
+              placeholder="Enter company name"
+              className="input"
+              value={name}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setName(e.target.value)
+              }
+            />
+          </div>
 
-        {error && <p className="text-red-600 mb-3">{error}</p>}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
-        <div className="flex justify-end space-x-3">
-          <button className="btn-secondary px-4 py-2 rounded" onClick={onClose}>
-            Cancel
-          </button>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button 
+              className="btn btn-secondary" 
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
 
-          <button
-            className="btn-primary px-4 py-2 rounded"
-            disabled={loading}
-            onClick={handleSubmit}
-          >
-            {loading ? "Saving..." : "Save"}
-          </button>
+            <button
+              className="btn btn-primary"
+              disabled={loading}
+              onClick={handleSubmit}
+            >
+              {loading ? "Saving..." : "Save Company"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ export default NextAuth({
       async authorize(credentials) {
         // Replace this with your actual authentication logic
         if (credentials?.email === 'test@example.com' && credentials?.password === 'password') {
-          return { id: '1', name: 'Test User', email: 'test@example.com' };
+          return { id: '1', name: 'Test User', email: 'test@example.com', role: 'user' };
         }
         return null;
       }

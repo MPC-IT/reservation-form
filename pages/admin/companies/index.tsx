@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AddCompanyModal from "../../../components/AddCompanyModal";
+import { Company } from "../../../types/company";
 
 // ------------------------------
 // VALIDATION SCHEMA
@@ -28,10 +29,6 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
-interface Company {
-  id: number;
-  name: string;
-}
 
 export default function ProfileForm() {
   const [profileType, setProfileType] = useState("");
@@ -244,7 +241,7 @@ export default function ProfileForm() {
               onClose={() => setShowAddCompany(false)}
               onCreated={(newCompany: Company) => {
                 setCompanies((prev) => [...prev, newCompany]);
-                setValue("companyId", String(newCompany.id));
+                setValue("companyId", newCompany.id);
               }}
             />
           </div>

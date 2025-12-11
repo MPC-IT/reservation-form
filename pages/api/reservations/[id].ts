@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
-import { validateSession } from '../../../../lib/session';
+import { validateSession } from 'lib/session';
 
 const prisma = new PrismaClient();
 

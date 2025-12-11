@@ -29,8 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     guestPasscode,
   } = reservation;
 
-  const dtStart = `${callDate}T${startTime.replace(":", "")}00`;
-  const dtEnd = `${callDate}T${String(Number(startTime.split(":")[0]) + 1).padStart(2, "0")}${startTime.split(":")[1]}00`;
+  const dtStart = `${callDate}T${startTime?.replace(":", "") || "000000"}00`;
+  const dtEnd = `${callDate}T${String(Number(startTime?.split(":")[0] || "00") + 1).padStart(2, "0")}${startTime?.split(":")[1] || "00"}00`;
 
   const description = `
 Company: ${companyName}

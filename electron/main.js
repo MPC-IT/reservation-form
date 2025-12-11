@@ -1,15 +1,9 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-
-/**
- * Determine if we're in development mode.
- * In dev: we load http://localhost:3000 (your Next.js dev server)
- * In prod: we load the hosted live app URL.
- */
-const isDev = process.env.NODE_ENV === "development";
+const isDev = require("electron-is-dev");
 
 // 🔁 Replace this with your real live URL:
-const PROD_URL = "https://your-production-url.example.com";
+const PROD_URL = `file://${path.join(__dirname, '../out/index.html')}`;
 
 let mainWindow;
 
@@ -22,15 +16,36 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: true,
+      contextIsolation: false,
+      webSecurity: false
     },
+    show: false // Don't show until ready-to-show
   });
 
+  const startUrl = isDev
+    ? 'http://localhost:3000'
+    : 'http://localhost:3001'; // Production will run Next.js server on port 3001
+
+  console.log('Loading URL:', startUrl);
+  mainWindow.loadURL(startUrl);
+
+  // Show window when content is loaded
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
+  // Handle loading errors
+  mainWindow.webContents.on('did-fail-load', () => {
+    console.log('Failed to load, retrying...');
+    setTimeout(() => {
+      mainWindow.loadURL(startUrl);
+    }, 1000);
+  });
+
+  // Open DevTools in development
   if (isDev) {
-    // Dev: use local Next.js dev server
-    mainWindow.loadURL("http://localhost:3000");
-  } else {
-    // Prod: use your hosted web app
-    mainWindow.loadURL(PROD_URL);
+    mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on("closed", () => {
