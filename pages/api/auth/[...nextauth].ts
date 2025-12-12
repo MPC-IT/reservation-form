@@ -48,6 +48,10 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/login",
   },
 
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
     async jwt({ token, account }) {
       if (account?.access_token) {
@@ -61,7 +65,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
 
-    async redirect({ baseUrl }) {
+    async redirect({ url, baseUrl }) {
+      // Always redirect to dashboard after successful login
       return `${baseUrl}/dashboard`;
     },
   },

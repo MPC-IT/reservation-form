@@ -34,15 +34,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const lines = csvText.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
 
+    // Support both "name" and "bridgeinstructions" column names
     const nameIndex = headers.indexOf('name');
-    if (nameIndex === -1) {
-      return res.status(400).json({ message: 'CSV must contain a "name" column' });
+    const bridgeInstructionsIndex = headers.indexOf('bridgeinstructions');
+    
+    let columnIndex = -1;
+    if (nameIndex !== -1) {
+      columnIndex = nameIndex;
+    } else if (bridgeInstructionsIndex !== -1) {
+      columnIndex = bridgeInstructionsIndex;
+    }
+    
+    if (columnIndex === -1) {
+      return res.status(400).json({ 
+        message: 'CSV must contain either a "name" or "BridgeInstructions" column. Found headers: ' + headers.join(', ') 
+      });
     }
 
     const bridgeInstructions: string[] = [];
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-      const name = values[nameIndex];
+      const name = values[columnIndex];
       if (!name) continue;
 
       bridgeInstructions.push(name);

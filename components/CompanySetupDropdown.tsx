@@ -21,6 +21,7 @@ interface TeamCall {
 interface CompanySetupDropdownProps {
   onCompanyChange?: (companyId: number | null) => void;
   onSetupChange?: (setupId: number | null) => void;
+  onSetupNameChange?: (setupName: string) => void;
   onTeamCallChange?: (teamCallId: number | null) => void;
   onSetupEmailChange?: (email: string) => void;
   initialCompanyId?: number | null;
@@ -32,6 +33,7 @@ interface CompanySetupDropdownProps {
 export default function CompanySetupDropdown({
   onCompanyChange,
   onSetupChange,
+  onSetupNameChange,
   onTeamCallChange,
   onSetupEmailChange,
   initialCompanyId = null,
@@ -150,7 +152,7 @@ export default function CompanySetupDropdown({
     setSelectedSetupId(setupId);
     setSelectedTeamCallId(null);
     
-    // Auto-fill setup email when setup is selected
+    // Auto-fill setup email and name when setup is selected
     if (setupId) {
       const selectedSetup = setups.find(setup => setup.id === setupId);
       if (selectedSetup?.email) {
@@ -160,9 +162,17 @@ export default function CompanySetupDropdown({
         setSelectedSetupEmail("");
         onSetupEmailChange?.("");
       }
+      
+      // Pass the setup name to the parent
+      if (selectedSetup?.name) {
+        onSetupNameChange?.(selectedSetup.name);
+      } else {
+        onSetupNameChange?.("");
+      }
     } else {
       setSelectedSetupEmail("");
       onSetupEmailChange?.("");
+      onSetupNameChange?.("");
     }
     
     onSetupChange?.(setupId);

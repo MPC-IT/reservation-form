@@ -1,22 +1,20 @@
 // pages/admin/data.tsx
 import { useState } from 'react';
 
-export default function AdminDataPage() {
+export default function DataManagement() {
   const [dataFile, setDataFile] = useState<File | null>(null);
+  const [bridgeFile, setBridgeFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  async function handleImport(e: React.FormEvent) {
+  const handleImport = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dataFile) {
-      setError('Please select a CSV file');
-      return;
-    }
+    if (!dataFile) return;
 
-    setError('');
-    setSuccess('');
     setImporting(true);
+    setError(null);
+    setSuccess(null);
 
     const formData = new FormData();
     formData.append('file', dataFile);
@@ -40,13 +38,74 @@ export default function AdminDataPage() {
     } finally {
       setImporting(false);
     }
-  }
+  };
+
+  const handleBridgeImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bridgeFile) return;
+
+    setImporting(true);
+    setError(null);
+    setSuccess(null);
+
+    const formData = new FormData();
+    formData.append('file', bridgeFile);
+
+    try {
+      const res = await fetch('/api/admin/bridge-instructions/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to import bridge instructions');
+      }
+
+      setSuccess(`Bridge instructions import successful! ${data.count} bridge instructions imported.`);
+      setBridgeFile(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setImporting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-primary mb-2">Manage Reservation Data</h1>
         <p className="text-secondary">Import companies, setups, and team calls from a unified CSV file</p>
+      </div>
+
+      <div className="card">
+        <h2 className="text-lg font-semibold text-primary mb-4">Import Bridge Instructions</h2>
+        
+        <form onSubmit={handleBridgeImport} className="space-y-4">
+          <div>
+            <label htmlFor="bridge-file" className="label">Bridge Instructions CSV File</label>
+            <input
+              id="bridge-file"
+              type="file"
+              accept=".csv"
+              onChange={(e) => setBridgeFile(e.target.files?.[0] || null)}
+              className="input"
+              required
+            />
+            <p className="text-xs text-muted mt-1">
+              CSV must contain: BridgeInstructions or name column
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={importing}
+            className="btn btn-primary w-full"
+          >
+            {importing ? 'Importing...' : 'Import Bridge Instructions'}
+          </button>
+        </form>
       </div>
 
       <div className="card">

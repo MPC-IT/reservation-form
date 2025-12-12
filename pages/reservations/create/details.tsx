@@ -93,11 +93,21 @@ export default function ReservationDetails({ companies, callType, reservation }:
     setValue('setupEmail', email);
   };
 
+  // Handle setup name change from CompanySetupDropdown
+  const handleSetupNameChange = (setupName: string) => {
+    setValue('setupName', setupName);
+  };
+
   // Handle company change from dropdown
   const handleCompanyChange = (companyId: number | null) => {
     if (companyId) {
       setIsManualCompany(false);
       setValue('companyId', companyId.toString());
+      // Auto-populate company name
+      const selectedCompany = companies.find(c => c.id === companyId);
+      if (selectedCompany) {
+        setValue('companyName', selectedCompany.name);
+      }
     } else {
       setIsManualCompany(true);
       setValue('companyId', '');
@@ -250,6 +260,7 @@ export default function ReservationDetails({ companies, callType, reservation }:
               <div className="sm:col-span-6">
                 <CompanySetupDropdown
                   onCompanyChange={handleCompanyChange}
+                  onSetupNameChange={handleSetupNameChange}
                   onSetupEmailChange={handleSetupEmailChange}
                   initialCompanyId={reservation?.companyId || null}
                   disabled={false}
@@ -268,6 +279,7 @@ export default function ReservationDetails({ companies, callType, reservation }:
                   placeholder={isManualCompany ? "Enter company name manually" : "Company name auto-filled from selection above"}
                   disabled={!isManualCompany}
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:text-gray-500"
+                  value={isManualCompany ? undefined : watch('companyName')}
                 />
                 {errors.companyName && (
                   <p className="mt-1 text-sm text-red-600">{errors.companyName.message}</p>

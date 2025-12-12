@@ -117,6 +117,32 @@ export default function AdminPage() {
             </svg>
           </div>
         </button>
+
+        <button
+          onClick={() => router.push('/admin/database')}
+          className="card p-6 text-left hover:border-accent transition-all duration-200 group"
+        >
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center mr-4 group-hover:bg-warning/20 transition-colors">
+              <svg className="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-primary mb-1">Database</h2>
+              <p className="text-sm text-muted">Database viewer</p>
+            </div>
+          </div>
+          <p className="text-secondary mb-4">
+            View and explore all database tables
+          </p>
+          <div className="flex items-center text-accent group-hover:text-accent-hover transition-colors">
+            <span className="text-sm font-medium">View Database</span>
+            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </button>
       </div>
     </div>
   );

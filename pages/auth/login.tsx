@@ -59,8 +59,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    // NextAuth will handle the redirect for us
-    await signIn("google", { callbackUrl: redirectTarget });
+    // Let NextAuth handle the redirect through the callback
+    await signIn("google");
   }
 
   return (
