@@ -43,7 +43,7 @@
   },
   "build": {
     "appId": "com.multipoint.reservationform",
-    "productName": "Reservation-Form",
+    "productName": "Reservation Form",
     "linux": {
       "target": "AppImage"
     },
@@ -52,9 +52,15 @@
       "icon": "public/reservations-form.ico"
     },
     "files": [
-      "out/**/*",
       "electron/**/*",
-      "public/**/*"
+      "public/**/*",
+      "!out/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "out",
+        "to": "out"
+      }
     ],
     "directories": {
       "buildResources": "public"
@@ -65,7 +71,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Reservation-Form",
+      "shortcutName": "Reservation Form",
       "installerIcon": "public/reservations-form.ico",
       "uninstallerIcon": "public/reservations-form.ico",
       "installerHeaderIcon": "public/reservations-form.ico",

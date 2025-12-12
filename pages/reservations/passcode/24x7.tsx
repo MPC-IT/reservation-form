@@ -10,6 +10,7 @@ interface Company {
 interface Setup {
   id: number;
   name: string;
+  email?: string;
 }
 
 export default function Passcode24x7Page() {
@@ -23,6 +24,7 @@ export default function Passcode24x7Page() {
   const [form, setForm] = useState({
     companyId: '',
     setupId: '',
+    setupEmail: '',
     host: '',
     referenceName: '',
     dialInNumbers: '',
@@ -50,27 +52,35 @@ export default function Passcode24x7Page() {
 
   useEffect(() => {
     async function fetchSetups() {
+      if (!form.companyId) {
+        setSetups([]);
+        return;
+      }
+      
       try {
-        const companyName = companies.find(c => c.id.toString() === form.companyId)?.name;
-        if (!companyName) {
-          setSetups([]);
-          return;
-        }
-        
-        const setupsRes = await fetch(`/api/setups/list?company=${encodeURIComponent(companyName)}`);
+        const setupsRes = await fetch(`/api/setups/get-by-company?companyId=${form.companyId}`);
         if (setupsRes.ok) {
           const data = await setupsRes.json();
-          setSetups(data.setups || []);
+          setSetups(data || []);
         }
       } catch {
         // ignore
       }
     }
     fetchSetups();
-  }, [form.companyId, companies]);
+  }, [form.companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Auto-fill Setup Email when Setup Name is selected from existing setups
+    if (name === 'setupId') {
+      const selectedSetup = setups.find(s => s.name === value);
+      if (selectedSetup && selectedSetup.email) {
+        setForm(prev => ({ ...prev, setupEmail: selectedSetup.email || '' }));
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,7 +97,8 @@ export default function Passcode24x7Page() {
           profileType: 'Passcode',
           callType: '24x7',
           companyName: companies.find(c => c.id.toString() === form.companyId)?.name || '',
-          setupName: setups.find(s => s.id.toString() === form.setupId)?.name || '',
+          setupName: form.setupId,
+          setupEmail: form.setupEmail,
           host: form.host,
           referenceName: form.referenceName,
           dialInNumbers: form.dialInNumbers,
@@ -103,6 +114,28 @@ export default function Passcode24x7Page() {
       if (!res.ok) throw new Error(data.message || 'Failed to create reservation');
 
       setSuccess('Reservation created successfully');
+      // Redirect to success page with reservation data after 1 second
+      setTimeout(() => {
+        const reservationData = {
+          profileType: 'Passcode',
+          callType: '24x7',
+          companyName: companies.find(c => c.id.toString() === form.companyId)?.name || '',
+          setupName: form.setupId,
+          setupEmail: form.setupEmail,
+          host: form.host,
+          referenceName: form.referenceName,
+          hostPasscode: form.hostPasscode,
+          guestPasscode: form.guestPasscode,
+          dialInNumbers: form.dialInNumbers,
+          internationalDialInNumbers: form.internationalDialInNumbers,
+          reservationId: form.reservationId,
+          bridgeInstructions: form.bridgeInstructions,
+        };
+        router.push({
+          pathname: '/reservations/success',
+          query: { data: JSON.stringify(reservationData) }
+        });
+      }, 1000);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -143,13 +176,27 @@ export default function Passcode24x7Page() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Setup Name</label>
-              <select name="setupId" value={form.setupId} onChange={handleChange} className="w-full border px-3 py-2 rounded">
-                <option value="">Select setup</option>
+              <label className="block text-sm font-medium mb-1">Setup Name *</label>
+              <input 
+                type="text" 
+                name="setupId" 
+                value={form.setupId} 
+                onChange={handleChange} 
+                className="w-full border px-3 py-2 rounded" 
+                placeholder="Select from dropdown or type new setup name"
+                list="setup-options"
+                required 
+              />
+              <datalist id="setup-options">
                 {setups.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.name} />
                 ))}
-              </select>
+              </datalist>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Setup Email *</label>
+              <input type="email" name="setupEmail" value={form.setupEmail} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
             </div>
 
             <div>

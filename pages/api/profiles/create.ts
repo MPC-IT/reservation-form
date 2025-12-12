@@ -10,30 +10,90 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const {
       profileType,
       callType,
-      companyId,
-      dealName,
+      companyName,
       setupName,
       setupEmail,
       callDate,
       startTime,
       timeZone,
+      host,
+      duration,
+      dialInNumbers,
+      internationalDialInNumbers,
       hostPasscode,
       guestPasscode,
-      conferenceId,
-      notes,
+      reservationId,
+      participants,
+      bridgeInstructions,
+      // Assisted form fields
+      dealReferenceName,
+      speakerDirectAccessLink,
+      speakerDialInNumbers,
+      speakerInternationalDialInNumbers,
+      speakerConferenceId,
+      participantDirectAccessLink,
+      participantDialInNumbers,
+      participantInternationalDialInNumbers,
+      participantConferenceId,
+      conferenceReplay,
+      replayFromDate,
+      replayToDate,
+      replayEndTime,
+      replayTimeZone,
+      replayCode,
+      replayAccessLink,
+      multiview,
+      multiviewAccessLink,
+      multiviewUsername,
+      multiviewConferenceNumber,
+      participantList,
+      participantListInformation,
+      participantListRecipientEmail,
+      operatorScript,
+      operatorScriptVerbiage,
+      conferenceMP3,
+      conferenceTranscript,
+      turnaroundTime,
+      qa,
+      qaSpecificOrder,
+      // 24x7 specific fields
+      referenceName,
     } = req.body;
 
-    if (!profileType || !callType || !companyId) {
-      return res.status(400).json({ error: "Missing required fields." });
+    if (!profileType || !callType || !companyName) {
+      return res.status(400).json({ error: "Missing required fields: profileType, callType, companyName" });
     }
 
-    // Get company name for the profile
-    const company = await prisma.company.findUnique({
-      where: { id: Number(companyId) }
+    // Find or create company
+    let company = await prisma.company.findUnique({
+      where: { name: companyName }
     });
-
+    
     if (!company) {
-      return res.status(400).json({ error: "Company not found." });
+      company = await prisma.company.create({
+        data: { name: companyName }
+      });
+    }
+
+    // Find or create setup if provided
+    let setup = null;
+    if (setupName) {
+      setup = await prisma.setup.findFirst({
+        where: {
+          name: setupName,
+          companyId: company.id
+        }
+      });
+
+      if (!setup) {
+        setup = await prisma.setup.create({
+          data: {
+            name: setupName,
+            email: setupEmail || null,
+            companyId: company.id
+          }
+        });
+      }
     }
 
     const profile = await prisma.profile.create({
@@ -41,8 +101,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         profileType,
         callType,
         companyName: company.name,
-        companyId: Number(companyId),
-        dealName: dealName || null,
+        companyId: company.id,
+        dealName: dealReferenceName || null,
         setupName: setupName || null,
         setupEmail: setupEmail || null,
         callDate: callDate || null,
@@ -50,8 +110,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         timeZone: timeZone || null,
         hostPasscode: hostPasscode || null,
         guestPasscode: guestPasscode || null,
-        conferenceId: conferenceId || null,
-        notes: notes || null,
+        conferenceId: speakerConferenceId || participantConferenceId || null,
+        notes: null,
+        setupId: setup?.id || null,
 
         // When user hits Save, treat as Pending Confirmation
         status: "Pending Confirmation",

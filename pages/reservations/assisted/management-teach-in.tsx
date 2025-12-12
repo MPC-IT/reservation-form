@@ -10,6 +10,7 @@ interface Company {
 interface Setup {
   id: number;
   name: string;
+  email?: string;
 }
 
 export default function ManagementTeachInPage() {
@@ -84,27 +85,34 @@ export default function ManagementTeachInPage() {
 
   useEffect(() => {
     async function fetchSetups() {
+      if (!form.companyId) {
+        setSetups([]);
+        return;
+      }
+      
       try {
-        const companyName = companies.find(c => c.id.toString() === form.companyId)?.name;
-        if (!companyName) {
-          setSetups([]);
-          return;
-        }
-        
-        const setupsRes = await fetch(`/api/setups/list?company=${encodeURIComponent(companyName)}`);
+        const setupsRes = await fetch(`/api/setups/get-by-company?companyId=${form.companyId}`);
         if (setupsRes.ok) {
           const data = await setupsRes.json();
-          setSetups(data.setups || []);
+          setSetups(data || []);
         }
       } catch {
         // ignore
       }
     }
     fetchSetups();
-  }, [form.companyId, companies]);
+  }, [form.companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Auto-fill Multiview link when Multiview is set to Yes
+    if (name === 'multiview' && value === 'Yes') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: 'http://mv1.multipointcom.com' }));
+    } else if (name === 'multiview' && value === 'No') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,7 +129,7 @@ export default function ManagementTeachInPage() {
           profileType: 'Assisted',
           callType: 'Management Teach In',
           companyName: companies.find(c => c.id.toString() === form.companyId)?.name || '',
-          setupName: setups.find(s => s.id.toString() === form.setupId)?.name || '',
+          setupName: form.setupId,
           setupEmail: form.setupEmail,
           dealReferenceName: form.dealReferenceName,
           callDate: form.date,
@@ -171,6 +179,10 @@ export default function ManagementTeachInPage() {
       if (!res.ok) throw new Error(data.message || 'Failed to create reservation');
 
       setSuccess('Reservation created successfully');
+      // Redirect to success page after 1 second
+      setTimeout(() => {
+        router.push('/reservations/success');
+      }, 1000);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -212,12 +224,21 @@ export default function ManagementTeachInPage() {
 
             <div>
               <label className="block text-sm font-medium mb-1">Setup Name *</label>
-              <select name="setupId" value={form.setupId} onChange={handleChange} className="w-full border px-3 py-2 rounded" required>
-                <option value="">Select setup</option>
+              <input 
+                type="text" 
+                name="setupId" 
+                value={form.setupId} 
+                onChange={handleChange} 
+                className="w-full border px-3 py-2 rounded" 
+                placeholder="Select from dropdown or type new setup name"
+                list="setup-options"
+                required 
+              />
+              <datalist id="setup-options">
                 {setups.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.name} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
             <div className="md:col-span-2">

@@ -10,6 +10,7 @@ interface Company {
 interface Setup {
   id: number;
   name: string;
+  email?: string;
 }
 
 export default function InvestorStandardPage() {
@@ -45,6 +46,7 @@ export default function InvestorStandardPage() {
     replayEndTime: '',
     replayTimeZone: '',
     replayCode: '',
+    replayAccessLink: '',
     multiview: 'No',
     multiviewAccessLink: '',
     multiviewUsername: '',
@@ -80,27 +82,49 @@ export default function InvestorStandardPage() {
 
   useEffect(() => {
     async function fetchSetups() {
+      if (!form.companyId) {
+        setSetups([]);
+        return;
+      }
+      
       try {
-        const companyName = companies.find(c => c.id.toString() === form.companyId)?.name;
-        if (!companyName) {
-          setSetups([]);
-          return;
-        }
-        
-        const setupsRes = await fetch(`/api/setups/list?company=${encodeURIComponent(companyName)}`);
+        const setupsRes = await fetch(`/api/setups/get-by-company?companyId=${form.companyId}`);
         if (setupsRes.ok) {
           const data = await setupsRes.json();
-          setSetups(data.setups || []);
+          setSetups(data || []);
         }
       } catch {
         // ignore
       }
     }
     fetchSetups();
-  }, [form.companyId, companies]);
+  }, [form.companyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    
+    // Auto-fill Multiview link when Multiview is set to Yes
+    if (name === 'multiview' && value === 'Yes') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: 'http://mv1.multipointcom.com' }));
+    } else if (name === 'multiview' && value === 'No') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: '' }));
+    }
+    
+    // Auto-fill Conference Replay link when Conference Replay is set to Yes
+    if (name === 'conferenceReplay' && value === 'Yes') {
+      setForm(prev => ({ ...prev, replayAccessLink: 'https://replay-dev.multipointcom.com/play-back' }));
+    } else if (name === 'conferenceReplay' && value === 'No') {
+      setForm(prev => ({ ...prev, replayAccessLink: '' }));
+    }
+    
+    // Auto-fill Setup Email when Setup Name is selected from existing setups
+    if (name === 'setupId') {
+      const selectedSetup = setups.find(s => s.name === value);
+      if (selectedSetup && selectedSetup.email) {
+        setForm(prev => ({ ...prev, setupEmail: selectedSetup.email || '' }));
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,7 +141,7 @@ export default function InvestorStandardPage() {
           profileType: 'Assisted',
           callType: form.callType,
           companyName: companies.find(c => c.id.toString() === form.companyId)?.name || '',
-          setupName: setups.find(s => s.id.toString() === form.setupId)?.name || '',
+          setupName: form.setupId,
           setupEmail: form.setupEmail,
           dealReferenceName: form.dealReferenceName,
           callDate: form.date,
@@ -162,6 +186,57 @@ export default function InvestorStandardPage() {
       if (!res.ok) throw new Error(data.message || 'Failed to create reservation');
 
       setSuccess('Reservation created successfully');
+      // Redirect to success page with reservation data after 1 second
+      setTimeout(() => {
+        const reservationData = {
+          profileType: 'Assisted',
+          callType: form.callType,
+          companyName: companies.find(c => c.id.toString() === form.companyId)?.name || '',
+          dealReferenceName: form.dealReferenceName,
+          setupName: form.setupId,
+          setupEmail: form.setupEmail,
+          callDate: form.date,
+          startTime: form.time,
+          timeZone: form.timeZone,
+          host: form.host,
+          duration: form.duration,
+          speakerDirectAccessLink: form.speakerDirectAccessLink,
+          speakerDialInNumbers: form.speakerDialInNumbers,
+          speakerInternationalDialInNumbers: form.speakerInternationalDialInNumbers,
+          speakerConferenceId: form.speakerConferenceId,
+          participantDirectAccessLink: form.participantDirectAccessLink,
+          participantDialInNumbers: form.participantDialInNumbers,
+          participantInternationalDialInNumbers: form.participantInternationalDialInNumbers,
+          participantConferenceId: form.participantConferenceId,
+          conferenceReplay: form.conferenceReplay,
+          replayFromDate: form.replayFromDate,
+          replayToDate: form.replayToDate,
+          replayEndTime: form.replayEndTime,
+          replayTimeZone: form.replayTimeZone,
+          replayCode: form.replayCode,
+          replayAccessLink: form.replayAccessLink,
+          multiview: form.multiview,
+          multiviewAccessLink: form.multiviewAccessLink,
+          multiviewUsername: form.multiviewUsername,
+          multiviewConferenceNumber: form.multiviewConferenceNumber,
+          reservationId: form.reservationId,
+          participants: form.participants,
+          participantList: form.participantList,
+          participantListInformation: form.participantListInformation,
+          participantListRecipientEmail: form.participantListRecipientEmail,
+          operatorScript: form.operatorScript,
+          operatorScriptVerbiage: form.operatorScriptVerbiage,
+          conferenceMP3: form.conferenceMP3,
+          conferenceTranscript: form.conferenceTranscript,
+          turnaroundTime: form.turnaroundTime,
+          qa: form.qa,
+          qaSpecificOrder: form.qaSpecificOrder,
+        };
+        router.push({
+          pathname: '/reservations/success',
+          query: { data: JSON.stringify(reservationData) }
+        });
+      }, 1000);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -214,12 +289,21 @@ export default function InvestorStandardPage() {
 
             <div>
               <label className="block text-sm font-medium mb-1">Setup Name *</label>
-              <select name="setupId" value={form.setupId} onChange={handleChange} className="w-full border px-3 py-2 rounded" required>
-                <option value="">Select setup</option>
+              <input 
+                type="text" 
+                name="setupId" 
+                value={form.setupId} 
+                onChange={handleChange} 
+                className="w-full border px-3 py-2 rounded" 
+                placeholder="Select from dropdown or type new setup name"
+                list="setup-options"
+                required 
+              />
+              <datalist id="setup-options">
                 {setups.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.name} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
             <div className="md:col-span-2">
@@ -399,8 +483,8 @@ export default function InvestorStandardPage() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1">Conference Replay Direct Access Link</label>
-                <input type="url" name="multiviewAccessLink" value="form.multiviewAccessLink" onChange={handleChange} className="w-full border px-3 py-2 rounded" 
-                  defaultValue="https://replay-dev.multipointcom.com/play-back" readOnly />
+                <input type="url" name="replayAccessLink" value={form.replayAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" 
+                  readOnly />
               </div>
 
               <div>

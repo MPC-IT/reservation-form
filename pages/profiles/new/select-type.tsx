@@ -100,10 +100,10 @@ export default function SelectTypePage() {
       {/* BUTTONS */}
       <div className="flex gap-4 pt-4">
         <button
-          onClick={() => validateAndProceed("details")}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          onClick={() => router.push('/profiles')}
+          className="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300"
         >
-          Next
+          ← Back
         </button>
 
         <button
