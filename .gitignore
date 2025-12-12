@@ -33,3 +33,5 @@ prisma/dev.db-journal
 
 test-*.txt
 test-*.md
+
+testing_audits/
