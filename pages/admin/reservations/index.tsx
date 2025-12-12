@@ -128,6 +128,10 @@ export default function AdminReservationsPage() {
     );
   }
 
+  function goToEdit(p: Profile) {
+    router.push(`/reservations/create/details?id=${p.id}`);
+  }
+
   function goToExport(p: Profile) {
     router.push(`/profiles/export/${p.id}`);
   }
@@ -333,6 +337,12 @@ export default function AdminReservationsPage() {
                             </option>
                           ))}
                         </select>
+                        <button
+                          className="btn btn-primary text-xs"
+                          onClick={() => goToEdit(p)}
+                        >
+                          Edit
+                        </button>
                         <button
                           className="btn btn-secondary text-xs"
                           onClick={() => goToExport(p)}

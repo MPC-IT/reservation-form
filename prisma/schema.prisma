@@ -17,6 +17,7 @@ model User {
 
   createdProfiles Profile[] @relation("CreatedBy")
   updatedProfiles Profile[] @relation("UpdatedBy")
+  auditLogs      AuditLog[]
 }
 
 model Profile {
@@ -55,6 +56,7 @@ model Profile {
   company     Company? @relation(fields: [companyId], references: [id])
   setupId     Int?
   setup       Setup?   @relation(fields: [setupId], references: [id])
+  auditLogs   AuditLog[]
   
   createdBy     User?    @relation("CreatedBy", fields: [createdById], references: [id])
   updatedBy     User?    @relation("UpdatedBy", fields: [updatedById], references: [id])
@@ -97,4 +99,24 @@ model TeamCall {
   updatedAt   DateTime @updatedAt
 
   @@unique([setupId, name])
+}
+
+// Audit logging for tracking reservation and email actions
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  eventType    String   // reservation_created, reservation_updated, reservation_email_sent, etc.
+  reservationId Int?    // Optional - some events may not be tied to a specific reservation
+  userId       Int      // User who performed the action
+  userEmail    String   // Email of the user who performed the action
+  metadata     String?  // JSON string containing additional context (recipient emails, fields changed, error messages, etc.)
+  createdAt    DateTime @default(now())
+
+  // Relationships
+  user         User     @relation(fields: [userId], references: [id])
+  reservation   Profile? @relation(fields: [reservationId], references: [id])
+
+  @@index([eventType])
+  @@index([reservationId])
+  @@index([userId])
+  @@index([createdAt])
 }

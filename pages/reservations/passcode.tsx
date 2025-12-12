@@ -22,7 +22,7 @@ export default function PasscodePage() {
 
       <h1 className="text-2xl font-bold mb-6">Passcode Call Type</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {passcodeTypes.map((type) => (
           <button
             key={type.id}
@@ -33,10 +33,10 @@ export default function PasscodePage() {
                 router.push('/reservations/passcode/24x7');
               }
             }}
-            className="w-full p-6 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            className="w-full p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
           >
-            <h2 className="text-lg font-semibold mb-2">{type.name}</h2>
-            <p className="text-gray-600">{type.description}</p>
+            <h2 className="text-base font-semibold mb-1">{type.name}</h2>
+            <p className="text-sm text-gray-600">{type.description}</p>
           </button>
         ))}
       </div>

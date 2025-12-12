@@ -3,10 +3,16 @@ import { useEffect, useState } from 'react';
 
 export default function ReservationSuccessPage() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(10);
   const [reservationData, setReservationData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailSentDirect, setEmailSentDirect] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [ccEmails, setCcEmails] = useState('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   useEffect(() => {
     // Get reservation data from query params or localStorage
@@ -14,25 +20,13 @@ export default function ReservationSuccessPage() {
     if (data) {
       setReservationData(data);
     }
-
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          router.push('/dashboard');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
   }, [router]);
 
   const handleEmailExport = async () => {
     if (!reservationData) return;
     
     setLoading(true);
+    setExportError(null);
     try {
       const response = await fetch('/api/reservations/email', {
         method: 'POST',
@@ -55,14 +49,64 @@ export default function ReservationSuccessPage() {
         document.body.removeChild(a);
         setEmailSent(true);
       } else {
-        throw new Error('Failed to generate email');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate email');
       }
     } catch (error) {
       console.error('Error generating email:', error);
-      alert('Failed to generate email. Please try again.');
+      setExportError(error instanceof Error ? error.message : 'Failed to generate email. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSendEmail = async () => {
+    if (!reservationData || !recipientEmail) return;
+    
+    setLoading(true);
+    setEmailError(null);
+    try {
+      const ccEmailArray = ccEmails ? ccEmails.split(',').map(email => email.trim()).filter(email => email) : [];
+      
+      const response = await fetch('/api/reservations/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reservationData,
+          recipientEmail,
+          ccEmails: ccEmailArray,
+          subject: emailSubject || 'Your Conference Reservation Confirmation'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setEmailSentDirect(true);
+        setShowEmailModal(false);
+        // Reset form
+        setRecipientEmail('');
+        setCcEmails('');
+        setEmailSubject('');
+      } else {
+        throw new Error(result.error || 'Failed to send email');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setEmailError(error instanceof Error ? error.message : 'Failed to send email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEmailModal = () => {
+    // Pre-fill recipient email if available in reservation data
+    if (reservationData?.setupEmail) {
+      setRecipientEmail(reservationData.setupEmail);
+    }
+    setShowEmailModal(true);
   };
 
   return (
@@ -107,11 +151,19 @@ export default function ReservationSuccessPage() {
             </button>
 
             <button
+              onClick={openEmailModal}
+              disabled={loading || !reservationData}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Sending...' : emailSentDirect ? 'Email Sent ✓' : 'Send Confirmation Email'}
+            </button>
+
+            <button
               onClick={handleEmailExport}
               disabled={loading || !reservationData}
               className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Generating...' : emailSent ? 'Email Generated ✓' : 'Export to Email'}
+              {loading ? 'Generating...' : emailSent ? 'Email Generated ✓' : 'Export Confirmation (HTML)'}
             </button>
 
             <button
@@ -130,13 +182,114 @@ export default function ReservationSuccessPage() {
             </div>
           )}
 
+          {emailSentDirect && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-800 text-center">
+                Confirmation email sent successfully to {recipientEmail}!
+              </p>
+            </div>
+          )}
+
+          {emailError && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-800 text-center">
+                Failed to send email: {emailError}
+              </p>
+            </div>
+          )}
+
+          {exportError && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-800 text-center">
+                Failed to export email: {exportError}
+              </p>
+            </div>
+          )}
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              Auto-redirecting to dashboard in {countdown} seconds...
+              Reservation created successfully. You can send confirmation emails or export the details below.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Email Send Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 text-center mb-4">
+                Send Confirmation Email
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Recipient Email *
+                  </label>
+                  <input
+                    type="email"
+                    value={recipientEmail}
+                    onChange={(e) => setRecipientEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="customer@example.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    CC Emails (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={ccEmails}
+                    onChange={(e) => setCcEmails(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="cc1@example.com, cc2@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Your Conference Reservation Confirmation"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={handleSendEmail}
+                  disabled={loading || !recipientEmail}
+                  className="flex-1 justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Sending...' : 'Send Email'}
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowEmailModal(false);
+                    setRecipientEmail('');
+                    setCcEmails('');
+                    setEmailSubject('');
+                  }}
+                  className="flex-1 justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

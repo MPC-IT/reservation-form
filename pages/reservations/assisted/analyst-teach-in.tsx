@@ -100,6 +100,51 @@ export default function AnalystTeachInPage() {
     } else if (name === 'multiview' && value === 'No') {
       setForm(prev => ({ ...prev, multiviewAccessLink: '' }));
     }
+    
+    // Auto-fill Conference Replay link when Conference Replay is set to Yes
+    if (name === 'conferenceReplay' && value === 'Yes') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: 'https://replay-dev.multipointcom.com/play-back' }));
+    } else if (name === 'conferenceReplay' && value === 'No') {
+      setForm(prev => ({ ...prev, multiviewAccessLink: '' }));
+    }
+  };
+
+  const handleClearForm = () => {
+    setForm({
+      companyId: '',
+      setupId: '',
+      setupEmail: '',
+      dealReferenceName: '',
+      date: '',
+      time: '',
+      timeZone: '',
+      host: '',
+      duration: '',
+      speakerDirectAccessLink: '',
+      speakerDialInNumbers: '',
+      speakerInternationalDialInNumbers: '',
+      speakerConferenceId: '',
+      participantDirectAccessLink: '',
+      participantDialInNumbers: '',
+      participantInternationalDialInNumbers: '',
+      participantConferenceId: '',
+      conferenceReplay: 'No',
+      replayFromDate: '',
+      replayToDate: '',
+      replayEndTime: '',
+      replayTimeZone: '',
+      replayCode: '',
+      multiview: 'No',
+      multiviewAccessLink: '',
+      multiviewUsername: '',
+      multiviewConferenceNumber: '',
+      reservationId: '',
+      participants: '',
+      replayParticipantListRecipientEmail: '',
+      other: '',
+    });
+    setError('');
+    setSuccess('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -269,7 +314,7 @@ export default function AnalystTeachInPage() {
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
           <h2 className="text-lg font-bold mb-4">ANALYST SPEAKER INVITATION DETAILS</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Speaker Team Direct Access Link (No wait time for call entry) *</label>
               <input type="url" name="speakerDirectAccessLink" value={form.speakerDirectAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
@@ -296,7 +341,7 @@ export default function AnalystTeachInPage() {
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
           <h2 className="text-lg font-bold mb-4">ANALYST PARTICIPANT INVITATION DETAILS</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Participant Direct Access Link (No wait time for call entry) *</label>
               <input type="url" name="participantDirectAccessLink" value={form.participantDirectAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
@@ -381,7 +426,7 @@ export default function AnalystTeachInPage() {
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1">Conference Replay Direct Access Link</label>
                 <input type="url" name="multiviewAccessLink" value={form.multiviewAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" 
-                  defaultValue="https://replay-dev.multipointcom.com/play-back" readOnly />
+                  readOnly />
               </div>
 
               <div>
@@ -466,7 +511,14 @@ export default function AnalystTeachInPage() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleClearForm}
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
+          >
+            Clear Form
+          </button>
           <button
             type="submit"
             disabled={loading}

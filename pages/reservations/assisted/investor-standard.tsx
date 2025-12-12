@@ -22,7 +22,7 @@ export default function InvestorStandardPage() {
   const [success, setSuccess] = useState('');
 
   const [form, setForm] = useState({
-    callType: 'Standard QA', // or 'Investor Call'
+    callType: 'Standard QA',
     companyId: '',
     setupId: '',
     setupEmail: '',
@@ -125,6 +125,54 @@ export default function InvestorStandardPage() {
         setForm(prev => ({ ...prev, setupEmail: selectedSetup.email || '' }));
       }
     }
+  };
+
+  const handleClearForm = () => {
+    setForm({
+      callType: 'Standard QA',
+      companyId: '',
+      setupId: '',
+      setupEmail: '',
+      dealReferenceName: '',
+      date: '',
+      time: '',
+      timeZone: '',
+      host: '',
+      duration: '',
+      speakerDirectAccessLink: '',
+      speakerDialInNumbers: '',
+      speakerInternationalDialInNumbers: '',
+      speakerConferenceId: '',
+      participantDirectAccessLink: '',
+      participantDialInNumbers: '',
+      participantInternationalDialInNumbers: '',
+      participantConferenceId: '',
+      conferenceReplay: 'No',
+      replayFromDate: '',
+      replayToDate: '',
+      replayEndTime: '',
+      replayTimeZone: '',
+      replayCode: '',
+      replayAccessLink: '',
+      multiview: 'No',
+      multiviewAccessLink: '',
+      multiviewUsername: '',
+      multiviewConferenceNumber: '',
+      reservationId: '',
+      participants: '',
+      participantList: 'No',
+      participantListInformation: '',
+      participantListRecipientEmail: '',
+      operatorScript: 'No',
+      operatorScriptVerbiage: '',
+      conferenceMP3: 'No',
+      conferenceTranscript: 'No',
+      turnaroundTime: '',
+      qa: 'No',
+      qaSpecificOrder: 'No',
+    });
+    setError('');
+    setSuccess('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -255,23 +303,12 @@ export default function InvestorStandardPage() {
         </button>
       </div>
 
-      <h1 className="text-2xl font-bold mb-6">
-        {form.callType === 'Investor Call' ? 'Investor Call Reservation' : 'Standard QA Reservation'}
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Standard QA Reservation</h1>
 
       {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
       {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">{success}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Call Type Selection */}
-        <div className="bg-white p-6 border border-gray-200 rounded-lg">
-          <label className="block text-sm font-medium mb-2">Call Type</label>
-          <select name="callType" value={form.callType} onChange={handleChange} className="w-full border px-3 py-2 rounded">
-            <option value="Standard QA">Standard QA</option>
-            <option value="Investor Call">Investor Call</option>
-          </select>
-        </div>
-
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* SETUP DETAILS */}
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
           <h2 className="text-lg font-bold mb-4">SETUP DETAILS</h2>
@@ -315,9 +352,7 @@ export default function InvestorStandardPage() {
 
         {/* CONFERENCE CALL DETAILS */}
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
-          <h2 className="text-lg font-bold mb-4">
-            {form.callType === 'Investor Call' ? 'INVESTOR - FULLY MONITORED CONFERENCE CALL DETAILS' : 'FULLY MONITORED CONFERENCE CALL DETAILS'}
-          </h2>
+          <h2 className="text-lg font-bold mb-4">FULLY MONITORED CONFERENCE CALL DETAILS</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -360,11 +395,9 @@ export default function InvestorStandardPage() {
 
         {/* SPEAKER INVITATION DETAILS */}
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
-          <h2 className="text-lg font-bold mb-4">
-            {form.callType === 'Investor Call' ? 'INVESTOR SPEAKER INVITATION DETAILS' : 'SPEAKER INVITATION DETAILS'}
-          </h2>
+          <h2 className="text-lg font-bold mb-4">SPEAKER INVITATION DETAILS</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Speaker Team Direct Access Link (No wait time for call entry) *</label>
               <input type="url" name="speakerDirectAccessLink" value={form.speakerDirectAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
@@ -395,11 +428,9 @@ export default function InvestorStandardPage() {
 
         {/* PARTICIPANT INVITATION DETAILS */}
         <div className="bg-white p-6 border border-gray-200 rounded-lg">
-          <h2 className="text-lg font-bold mb-4">
-            {form.callType === 'Investor Call' ? 'INVESTOR PARTICIPANT INVITATION DETAILS' : 'PARTICIPANT INVITATION DETAILS'}
-          </h2>
+          <h2 className="text-lg font-bold mb-4">PARTICIPANT INVITATION DETAILS</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Participant Direct Access Link (No wait time for call entry) *</label>
               <input type="url" name="participantDirectAccessLink" value={form.participantDirectAccessLink} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
@@ -648,7 +679,14 @@ export default function InvestorStandardPage() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleClearForm}
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
+          >
+            Clear Form
+          </button>
           <button
             type="submit"
             disabled={loading}

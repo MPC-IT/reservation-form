@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
@@ -11,22 +11,27 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "incremental": true,
-    "module": "esnext",
     "esModuleInterop": true,
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "incremental": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
       ]
     },
-    "types": [
-      "next",
-      "node"
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
     ]
   },
   "include": [
@@ -35,7 +40,8 @@
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    "**/*.mts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,5 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../lib/prisma";
+import { addToCallLog } from "../../../lib/callLogWriter";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -118,6 +121,43 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         status: "Pending Confirmation",
       },
     });
+
+    // Add reservation to Call Log (non-blocking)
+    try {
+      // Get Google access token from session
+      const googleSession = await getServerSession(req, res, authOptions);
+      const accessToken = (googleSession as any)?.accessToken;
+
+      if (accessToken && callDate && startTime) {
+        const callLogResult = await addToCallLog(accessToken, {
+          id: profile.id,
+          profileType,
+          callType,
+          companyName: company.name,
+          dealName: dealReferenceName || '',
+          setupName: setupName || '',
+          setupEmail: setupEmail || '',
+          callDate,
+          startTime,
+          timeZone: timeZone || '',
+          host,
+          duration,
+          createdAt: profile.createdAt,
+        });
+
+        if (!callLogResult.success) {
+          console.error('Call Log update failed:', callLogResult.error);
+          // Don't fail the reservation creation, just log the error
+        } else {
+          console.log(`Reservation ${profile.id} added to Call Log successfully`);
+        }
+      } else {
+        console.warn('Missing Google access token or call date/time for Call Log update');
+      }
+    } catch (callLogError) {
+      console.error('Unexpected error adding to Call Log:', callLogError);
+      // Don't fail the reservation creation
+    }
 
     return res.status(200).json({ profile });
   } catch (err) {

@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Merge new team types with existing ones (remove duplicates)
-    const allTeamTypes = [...new Set([...existingTeamTypes, ...teamTypes])];
+    const allTeamTypes = Array.from(new Set([...existingTeamTypes, ...teamTypes]));
 
     // Save updated team types
     fs.writeFileSync(teamTypesPath, JSON.stringify(allTeamTypes, null, 2));

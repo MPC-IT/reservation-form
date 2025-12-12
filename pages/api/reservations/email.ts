@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { formatHtmlEmail } from '../../../lib/formatEmail';
+import { ConfirmationHtmlGenerator } from '../../../lib/confirmationHtmlGenerator';
+import { ReservationConfirmationData } from '../../../components/ConfirmationRenderer';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -7,10 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const reservationData = req.body;
+    const reservationData: ReservationConfirmationData = req.body;
     
-    // Generate HTML email content
-    const emailHtml = formatHtmlEmail(reservationData);
+    // Generate HTML email content using the shared renderer
+    const emailHtml = ConfirmationHtmlGenerator.generateEmailHtml(reservationData);
     
     // Set appropriate headers for HTML file download
     res.setHeader('Content-Type', 'text/html');

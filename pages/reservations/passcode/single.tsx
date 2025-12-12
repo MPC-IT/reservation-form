@@ -87,6 +87,28 @@ export default function SingleDatePasscodePage() {
     }
   };
 
+  const handleClearForm = () => {
+    setForm({
+      companyId: '',
+      setupId: '',
+      setupEmail: '',
+      date: '',
+      time: '',
+      timeZone: '',
+      host: '',
+      duration: '',
+      dialInNumbers: '',
+      internationalDialInNumbers: '',
+      hostPasscode: '',
+      guestPasscode: '',
+      reservationId: '',
+      participants: '',
+      bridgeInstructions: '',
+    });
+    setError('');
+    setSuccess('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -325,7 +347,14 @@ export default function SingleDatePasscodePage() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleClearForm}
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
+          >
+            Clear Form
+          </button>
           <button
             type="submit"
             disabled={loading}

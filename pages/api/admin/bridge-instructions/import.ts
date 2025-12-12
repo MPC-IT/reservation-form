@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Merge new bridge instructions with existing ones (remove duplicates)
-    const allBridgeInstructions = [...new Set([...existingBridgeInstructions, ...bridgeInstructions])];
+    const allBridgeInstructions = Array.from(new Set([...existingBridgeInstructions, ...bridgeInstructions]));
 
     // Save updated bridge instructions
     fs.writeFileSync(bridgeInstructionsPath, JSON.stringify(allBridgeInstructions, null, 2));

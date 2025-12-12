@@ -22,6 +22,7 @@ interface CompanySetupDropdownProps {
   onCompanyChange?: (companyId: number | null) => void;
   onSetupChange?: (setupId: number | null) => void;
   onTeamCallChange?: (teamCallId: number | null) => void;
+  onSetupEmailChange?: (email: string) => void;
   initialCompanyId?: number | null;
   initialSetupId?: number | null;
   initialTeamCallId?: number | null;
@@ -32,6 +33,7 @@ export default function CompanySetupDropdown({
   onCompanyChange,
   onSetupChange,
   onTeamCallChange,
+  onSetupEmailChange,
   initialCompanyId = null,
   initialSetupId = null,
   initialTeamCallId = null,
@@ -45,6 +47,7 @@ export default function CompanySetupDropdown({
   const [selectedTeamCallId, setSelectedTeamCallId] = useState<number | null>(initialTeamCallId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedSetupEmail, setSelectedSetupEmail] = useState<string>("");
 
   // Load companies on mount
   useEffect(() => {
@@ -135,15 +138,33 @@ export default function CompanySetupDropdown({
     setSelectedCompanyId(companyId);
     setSelectedSetupId(null);
     setSelectedTeamCallId(null);
+    setSelectedSetupEmail("");
     onCompanyChange?.(companyId);
     onSetupChange?.(null);
     onTeamCallChange?.(null);
+    onSetupEmailChange?.("");
   };
 
   const handleSetupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const setupId = e.target.value ? parseInt(e.target.value) : null;
     setSelectedSetupId(setupId);
     setSelectedTeamCallId(null);
+    
+    // Auto-fill setup email when setup is selected
+    if (setupId) {
+      const selectedSetup = setups.find(setup => setup.id === setupId);
+      if (selectedSetup?.email) {
+        setSelectedSetupEmail(selectedSetup.email);
+        onSetupEmailChange?.(selectedSetup.email);
+      } else {
+        setSelectedSetupEmail("");
+        onSetupEmailChange?.("");
+      }
+    } else {
+      setSelectedSetupEmail("");
+      onSetupEmailChange?.("");
+    }
+    
     onSetupChange?.(setupId);
     onTeamCallChange?.(null);
   };

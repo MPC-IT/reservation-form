@@ -99,6 +99,33 @@ export default function TeamCallPage() {
     }
   };
 
+  const handleClearForm = () => {
+    setForm({
+      teamTypeId: '',
+      companyId: null,
+      setupId: null,
+      date: '',
+      time: '',
+      timeZone: '',
+      host: '',
+      duration: '',
+      committeeDialInNumbers: '',
+      committeeInternationalDialInNumbers: '',
+      committeeConferenceId: '',
+      teamDialInNumbers: '',
+      teamInternationalDialInNumbers: '',
+      teamConferenceId: '',
+      reservationId: '',
+      participants: '',
+      participantList: 'None',
+      participantListInformation: '',
+      participantListRecipientEmail: '',
+      other: '',
+    });
+    setError('');
+    setSuccess('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -335,7 +362,14 @@ export default function TeamCallPage() {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleClearForm}
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
+          >
+            Clear Form
+          </button>
           <button
             type="submit"
             disabled={loading}
