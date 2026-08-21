@@ -94,7 +94,7 @@
     "@types/react-dom": "18.2.7",
     "autoprefixer": "^10.4.15",
     "concurrently": "^8.2.1",
-    "electron": "^28.3.0",
+    "electron": "^39.8.10",
     "electron-builder": "^26.0.12",
     "eslint": "8.48.0",
     "eslint-config-next": "13.5.4",
