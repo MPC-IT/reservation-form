@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@auth/core": "^0.34.3",
-    "@aws-sdk/client-ses": "^3.948.0",
+    "@aws-sdk/client-ses": "^3.1166.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@google-cloud/local-auth": "^3.0.1",
